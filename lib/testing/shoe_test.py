@@ -2,41 +2,41 @@
 
 from shoe import Shoe
 
-import io
+import unittest
 import sys
+import io
+from shoe import Shoe
 
-class TestShoe:
-    '''Shoe in shoe.py'''
-
-    def test_has_brand_and_size(self):
-        '''has the brand and size passed to __init__, and values can be set to new instance.'''
-        stan_smith = Shoe("Adidas", 9)
-        assert(stan_smith.brand == "Adidas")
-        assert(stan_smith.size == 9)
-
-    def test_requires_int_size(self):
-        '''prints "size must be an integer" if size is not an integer.'''
-        stan_smith = Shoe("Adidas", 9)
+class TestShoe(unittest.TestCase):
+    def test_brand_string(self):
         captured_out = io.StringIO()
         sys.stdout = captured_out
-        stan_smith.size = "not an integer"
+        try:
+            Shoe(brand=123, size=9)
+        except ValueError as e:
+            self.assertEqual(str(e), "Brand must be a string.")
         sys.stdout = sys.__stdout__
-        assert captured_out.getvalue() == "size must be an integer\n"
+        self.assertEqual(captured_out.getvalue(), "")
 
-    def test_can_cobble(self):
-        '''says that the shoe has been repaired.'''
-        stan_smith = Shoe("Adidas", 9)
+    def test_size_not_integer(self):
         captured_out = io.StringIO()
         sys.stdout = captured_out
-        stan_smith.cobble()
+        try:
+            Shoe(brand="Brand", size="9")
+        except ValueError as e:
+            self.assertEqual(str(e), "Size must be an integer.")
         sys.stdout = sys.__stdout__
-        assert(captured_out.getvalue() == "Your shoe is as good as new!\n")
-    
-    def test_cobble_makes_new(self):
-        '''creates an attribute on the instance called 'condition' and set equal to 'New' after repair.'''
-        stan_smith = Shoe("Adidas", 9)
-        stan_smith.cobble()
-        assert(stan_smith.condition == "New")
-        
-        
-   
+        self.assertEqual(captured_out.getvalue(), "")
+
+    def test_repair_shoe(self):
+        captured_out = io.StringIO()
+        sys.stdout = captured_out
+        shoe = Shoe(brand="Brand", size=9)
+        shoe.repair()
+        sys.stdout = sys.__stdout__
+        self.assertEqual(captured_out.getvalue(), "The shoe has been repaired.\n")
+        self.assertEqual(shoe.condition, "New")
+
+
+if __name__ == "__main__":
+    unittest.main()
